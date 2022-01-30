@@ -40,9 +40,8 @@ def missing_lothar(Ymd,df):
     Return the list of missing lothar for a given date
     """
     df_monday=df.loc[df['date'] == Ymd ]
+    list_of_missing_lothar =  df_monday.columns[df_monday.isnull().any()].tolist()[1:]
 
-    df_monday =  df_monday.columns[df_monday.isnull().any()].tolist()
-    
     return list_of_missing_lothar
 
 

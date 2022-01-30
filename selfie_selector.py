@@ -2,11 +2,11 @@ from tools import *
 import requests
 
 
-#url = 'https://'
-#r = requests.get(url, allow_redirects=True)
-#open('monday_selfies.csv', 'wb').write(r.content)
+url = 'https://raw.githubusercontent.com/freerafiki/lothar-face-classification/main/covered.csv'
+r = requests.get(url, allow_redirects=True)
+open('covered.csv', 'wb').write(r.content)
 
-#df_selfies=pd.read_csv('monday_selfies.csv')
+df_selfies=pd.read_csv('covered.csv')
 
 
 # get dir with images and create list of all images
@@ -46,9 +46,9 @@ for file in mondays:
     directory=os.path.dirname(file)
 
     # check if we are interested at this date
-    """
-    Ymd=str2date(filename)
-    missing=missing_lothar(Ymd,df_selfeis)
+    Ymd=str2date(filename).strftime("%Y-%m-%d")
+    print(Ymd)
+    missing=missing_lothar(Ymd,df_selfies)
     if (len(missing)==0):
         # Skip the remaing part. All selfies are covered.
         continue
@@ -58,8 +58,10 @@ for file in mondays:
         for enc in lothars_encoders:
             if (enc[0] in missing):
                 encoders_to_use.append(enc)
-    """
-    encoders_to_use=lothars_encoders
+
+    
+
+    #encoders_to_use=lothars_encoders
     
     # open for cv
     image = cv2.imread(file)
