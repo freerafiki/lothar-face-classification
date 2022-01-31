@@ -6,3 +6,6 @@ with the check_selection.py script.py . Last, use the
 check_duplicates.py to remove duplicated selfies listed in the csv
 file.
 
+STATUS
+
+![2022](https://github.com/freerafiki/lothar-face-classification/tree/main/figures_covered/covered2022.png?raw=true)
