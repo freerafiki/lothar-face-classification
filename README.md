@@ -8,4 +8,4 @@ file.
 
 STATUS
 
-![2022](https://github.com/freerafiki/lothar-face-classification/tree/main/figures_covered/covered2022.png)
+![2022](figures_covered/covered2022.png)
