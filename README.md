@@ -9,3 +9,12 @@ file.
 STATUS
 
 ![2022](figures_covered/covered2022.png)
+![2021](figures_covered/covered2021.png)
+![2020](figures_covered/covered2020.png)
+![2019](figures_covered/covered2019.png)
+![2018](figures_covered/covered2018.png)
+![2017](figures_covered/covered2017.png)
+![2016](figures_covered/covered2016.png)
+![2015](figures_covered/covered2015.png)
+![2014](figures_covered/covered2014.png)
+![2013](figures_covered/covered2013.png)
