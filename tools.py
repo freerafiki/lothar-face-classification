@@ -29,7 +29,7 @@ def init_lothar_encoders(lothar,path_for_directory='./'):
        ...
     """
     encoders=[]
-    encs= glob.glob(path_for_directory+lothar+'/*txt')
+    encs= glob.glob(os.path.join(path_for_directory,lothar)+'/*txt')
     for enc_name in encs:
         enc=np.loadtxt(enc_name).flatten()
         encoders.append(enc)
@@ -42,6 +42,7 @@ def missing_lothar(Ymd,df):
     df_monday=df.loc[df['date'] == Ymd ]
     list_of_missing_lothar =  df_monday.columns[df_monday.isnull().any()].tolist()[1:]
 
+    #print(list_of_missing_lothar)
     return list_of_missing_lothar
 
 
@@ -58,8 +59,7 @@ def rotation_angles(step=5, limit=45):
     return angles
 
 def compare_image_with_encoders(encoders,
-                                image_to_test_encoding,
-                                threeshold=0.6):
+                                image_to_test_encoding):
     """
     Compare one image against multiple encoders
 
@@ -69,7 +69,7 @@ def compare_image_with_encoders(encoders,
     threeshold : threeshold distance,(default=0.6)
 
     Returns:
-    True or False
+    distance
     """
     # Load a test image and get encondings for it
     #image_to_test = face_recognition.load_image_file(image_path)
@@ -78,14 +78,16 @@ def compare_image_with_encoders(encoders,
 
     
     # See how far apart the test image is from the known faces
+    #print(encoders)
     face_distances = face_recognition.face_distance(
         encoders, image_to_test_encoding
     )
-    avg_distance = sum(face_distances)/len(face_distances)
-    if (avg_distance < threeshold):
-        return True
-    else:
-        return False
+    #print(face_distances)
+    distance = sum(face_distances)/len(face_distances)
+    #distance = min(face_distances)
+    
+    return distance;
+   
     
 def init_lothars_encoders(lothar_dir):
     """
@@ -107,21 +109,26 @@ def init_lothars_encoders(lothar_dir):
         
     
 
-def which_lothar(image_to_test_encoding,lothars_encoders,threeshold):
+def which_lothar(image_to_test_encoding,lothars_encoders,threeshold=0.6):
     """
     Return the name of the person in the (encoded) image
     or notfound string
     """
     found=False
     stringout='notfound'
+    distances=[]
     for lothar_encoders in lothars_encoders:
-        result=compare_image_with_encoders(lothar_encoders[1],
-                                           image_to_test_encoding,
-                                           threeshold=threeshold)
-        if result:
-            stringout=lothar_encoders[0]
-            found=True
-            break
+        #print(lothar_encoders[0],'compared enc',len(lothar_encoders[1]))
+        distances.append(compare_image_with_encoders(lothar_encoders[1],
+                                           image_to_test_encoding))
+    
+    imin=np.argmin(distances)
+    #print(distances)
+    #print(imin)
+    #print(lothars_encoders[imin][0])
+    if distances[imin]<threeshold:    
+        stringout=lothars_encoders[imin][0]
+        found=True
     return stringout,found
 
 def str2date(string):
@@ -267,7 +274,7 @@ def lothars_in_cv2image(image, lothars_encoders,fc):
             w=int(min(w+2*w*extra,width))
             h=int(min(h+2*h*extra_h,height))
 
-            print('w/h=',w/h)
+            #print('w/h=',w/h)
 
             # rotate colored image
             rotated_image=rotate_image(image,angle)
@@ -276,7 +283,9 @@ def lothars_in_cv2image(image, lothars_encoders,fc):
             #cv2.rectangle(rotated_image, (x,y), (x+w,y+h), (255,255,255))
             sub_face = rotated_image[y:y+h, x:x+w]
 
-            index, name, encoding = lothars_in_selfies([subface], lothars_encoders, num_jitters=2,keep_searching=False)
+            index, name, encoding = lothars_in_selfies([subface], lothars_encoders,
+                                                       [x,y,w,h],
+                                                       num_jitters=2,keep_searching=False)
 
             if (len(name)>0):
                 lothar_selfies.append(sub_face)
@@ -386,17 +395,21 @@ def lothars_in_cv2selfies(selfies, lothars_encoders,known_face_locations=None, n
         # convert to the format read by face-recognition
         # Some passages can but saved
 
+        #sub_face=fix_width(sub_face,new_width=150)
         
         img = cv2.cvtColor(sub_face, cv2.COLOR_BGR2RGB)
         im_pil = Image.fromarray(sub_face)
         im4face_rec = np.array(im_pil.convert('RGB'))
     
         # compute encoding of current selfie
+        #print('know',known_face_locations)
         image_to_test_encodings = face_recognition.face_encodings(im4face_rec,
-                                                                  known_face_locations=known_face_locations,
+                                                                  known_face_locations=[known_face_locations],
                                                                   num_jitters=num_jitters,model='large')
-        print('faces_encoding=',len(image_to_test_encodings))
+        
+        #print('faces_encoding=',len(image_to_test_encodings))
         if (len(image_to_test_encodings) == 1 ):
+            #print('first entry',image_to_test_encodings[0][0])
             # test 
             [which_lothar_is, found_lothar] = which_lothar(image_to_test_encodings[0],lothars_encoders,threeshold=0.6)
             if (found_lothar):

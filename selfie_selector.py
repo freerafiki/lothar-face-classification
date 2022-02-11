@@ -66,7 +66,7 @@ for file in mondays:
 
     # check if we are interested at this date
     Ymd=str2date(filename).strftime("%Y-%m-%d")
-    print(Ymd)
+    #print(Ymd)
     missing=missing_lothar(Ymd,df_selfies)
     if (len(missing)==0):
         # Skip the remaing part. All selfies are covered.
@@ -91,8 +91,11 @@ for file in mondays:
     if (search_lothar):
         # find lothars
         for i, face in enumerate(faces):
+            position=face_positions[i]
+            alpha,x,y,w,h=position
             [index, name, encoding] = lothars_in_cv2selfies([face],
                                                             encoders_to_use,
+                                                            [y+h,x+w,y,x],
                                                             keep_searching=False)
             if (True) and (len(name)>0):
                 print('Found ' + name[0] +'!!!')

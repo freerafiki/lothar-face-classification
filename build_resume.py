@@ -42,9 +42,10 @@ sdf=split_years(table_plus)
 for i, ds in enumerate(sdf):
     del ds['year']
     sb.set()
-    fig, ax = plt.subplots(figsize=(11, 11))
+    fig, ax = plt.subplots()
     my_colors=['red','green','yellow']
-    hm=sb.heatmap(ds,cmap=my_colors,vmin=0,vmax=2,linewidth=0.1, linecolor='k',ax=ax)
+    hm=sb.heatmap(ds,cmap=my_colors,vmin=0,vmax=2,
+                  linewidth=0.1, linecolor='k',ax=ax)
     hm.set_yticklabels(ds.index.strftime('%Y-%m-%d'))
   
     figure = hm.get_figure()    
